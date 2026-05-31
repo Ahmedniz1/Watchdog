@@ -1,0 +1,17 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Testing caches
+.pytest_cache/
+.pytest/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Env
+env/
+venv/
+.env
