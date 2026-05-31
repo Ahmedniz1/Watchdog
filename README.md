@@ -142,6 +142,43 @@ model can vary, so `runs > 1` with `temperature=0` warns you.)
 
 ---
 
+## Catching regressions
+
+This is what the tool is named for: compare a run against a **baseline** you
+blessed earlier and fail when fewer conditions pass than before. The baseline
+stores condition pass rates (never your model's text), so it's safe to commit to
+your repo as the comparison point.
+
+```python
+# Once, when the output is known-good:
+suite.run().save_baseline()          # writes .watchdog/<suite>.json  -> commit it
+
+# Later, after a prompt/model change:
+diff = suite.run().diff_against_baseline()
+print(diff.summary())
+assert diff.within_threshold(5), "regression > 5% from baseline"   # gate CI
+```
+
+```text
+Suite: support_bot
+----------------------------------------------------
+  [PASS] refund query - basic           4/4  (was 4/4)
+  [FAIL] refund query - angry user      1/4  (was 4/4)  <-- REGRESSION
+  [PASS] tone check                     3/3  (was 3/3)
+----------------------------------------------------
+Score:    8/11  (73%)
+Baseline: 11/11  (100%)
+Delta:    -27%
+
+3 condition(s) regressed. Review before shipping.
+```
+
+`within_threshold(pct)` is your CI gate: `0` (strict) fails on any drop, `5`
+tolerates up to a 5-point fall in the suite score. New cases never count as
+regressions; cases dropped since the baseline are listed separately.
+
+---
+
 ## LLM-as-judge (opt-in)
 
 When a check genuinely needs a model to read the output — "is this empathetic?",
@@ -218,11 +255,11 @@ This is the seam a YAML loader and CLI build on (on the roadmap below).
 ## Roadmap
 
 Shipped: core model · heuristic + semantic verifiers · LiteLLM runner ·
-`runs=N` sampling · LLM-judge layer · packaging.
+`runs=N` sampling · LLM-judge layer · baseline storage + regression diff ·
+packaging.
 
-Next: baseline storage + regression diff (`--save-baseline` / `--diff`) ·
-terminal & self-contained HTML reports · YAML loader · `watchdog` CLI ·
-GitHub Actions template.
+Next: a `watchdog` CLI (`run` / `--save-baseline` / `--diff --threshold`) ·
+YAML loader · terminal & self-contained HTML reports · GitHub Actions template.
 
 Deliberately out of scope: a web UI/dashboard, prompt storage/versioning,
 production traffic monitoring, and non-text output evaluation.

@@ -26,6 +26,15 @@ from llm_watchdog.llm_judge import (
     estimate_run_cost,
     is_judge_condition,
 )
+from llm_watchdog.baseline import (
+    save_baseline,
+    load_baseline,
+    compare,
+    Baseline,
+    SuiteDiff,
+    CaseDiff,
+    BaselineError,
+)
 
 # Importing this module registers the optional semantic verifier's *type*
 # without importing torch (the heavy import is deferred to evaluation time).
@@ -56,4 +65,11 @@ __all__ = [
     "LLMRubric",
     "estimate_run_cost",
     "is_judge_condition",
+    "save_baseline",
+    "load_baseline",
+    "compare",
+    "Baseline",
+    "SuiteDiff",
+    "CaseDiff",
+    "BaselineError",
 ]

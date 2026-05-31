@@ -6,6 +6,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Baseline storage + regression diff** — `save_baseline()` writes a suite's
+  condition pass rates to `.watchdog/<suite>.json` (no raw output persisted), and
+  `diff_against_baseline()` compares a later run against it. `SuiteDiff.summary()`
+  prints a terminal-safe table and `within_threshold(pct)` gates CI on the
+  allowed score drop. New cases never count as regressions; removed cases are
+  listed separately.
+
 ## [0.1.0] - 2026-05-31
 
 First packaged release: `pip install llm-watchdog` now works, with a

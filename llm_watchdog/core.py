@@ -232,9 +232,31 @@ class SuiteResult:
             "cases": [c.to_dict() for c in self.case_results],
         }
 
-    # `save()`, `delta_summary()` and baseline comparison arrive with the
-    # baseline-storage and reporter features. `to_dict()` is the seam they
-    # will serialize through.
+    def save_baseline(self, directory: str = ".watchdog"):
+        """Persist this result as the regression baseline for its suite.
+
+        Convenience wrapper over :func:`llm_watchdog.baseline.save_baseline`.
+        Imported lazily to keep ``core`` free of even intra-package import
+        ordering constraints. Returns the path written.
+        """
+        from llm_watchdog.baseline import save_baseline
+
+        return save_baseline(self, directory=directory)
+
+    def diff_against_baseline(self, directory: str = ".watchdog"):
+        """Compare this result to the saved baseline; ``None`` if none exists.
+
+        Convenience wrapper over :func:`llm_watchdog.baseline.load_baseline` +
+        :func:`llm_watchdog.baseline.compare`. Returns a
+        :class:`~llm_watchdog.baseline.SuiteDiff`, or ``None`` when no baseline
+        has been saved yet (the caller decides whether that's an error).
+        """
+        from llm_watchdog.baseline import compare, load_baseline
+
+        base = load_baseline(self.suite_name, directory=directory)
+        if base is None:
+            return None
+        return compare(self, base)
 
 
 # ---------------------------------------------------------------------------
