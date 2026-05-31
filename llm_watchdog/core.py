@@ -274,6 +274,18 @@ class TestCase:
             model=model or self.model,
         )
 
+    def run(self, model: Optional[str] = None, **kwargs) -> CaseResult:
+        """Call the model under test and score the output. Makes one LLM call.
+
+        Convenience wrapper around :func:`llm_watchdog.runner.run_case` so the
+        quickstart ``case.run()`` works. ``runner`` is imported lazily here:
+        it pulls in the optional ``litellm`` dependency, and keeping that off
+        the core import path is what lets the offline layer stay dependency-free.
+        """
+        from llm_watchdog.runner import run_case  # lazy: keeps litellm optional
+
+        return run_case(self, model=model, **kwargs)
+
 
 @dataclass
 class Suite:
@@ -311,3 +323,15 @@ class Suite:
             case_results=case_results,
             model=self.model,
         )
+
+    def run(self, model: Optional[str] = None, **kwargs) -> SuiteResult:
+        """Run every case against its model and score the outputs. One call per case.
+
+        Convenience wrapper around :func:`llm_watchdog.runner.run_suite` so the
+        quickstart ``suite.run()`` works. Imported lazily for the same reason as
+        :meth:`TestCase.run` — to keep the optional ``litellm`` dependency off
+        the core import path.
+        """
+        from llm_watchdog.runner import run_suite  # lazy: keeps litellm optional
+
+        return run_suite(self, model=model, **kwargs)
