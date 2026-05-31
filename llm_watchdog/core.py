@@ -163,7 +163,7 @@ class CaseResult:
         lines = [f"{self.case_name}: {len(failures)} condition(s) failed"]
         for r in failures:
             detail = f" - {r.detail}" if r.detail else ""
-            lines.append(f"  \u2717 {r.description}{detail}")
+            lines.append(f"  - {r.description}{detail}")
         return "\n".join(lines)
 
     def to_dict(self) -> Dict:
@@ -215,8 +215,8 @@ class SuiteResult:
     def summary(self) -> str:
         lines = [f"Suite: {self.suite_name}"]
         for c in self.case_results:
-            mark = "\u2713" if c.passed else "\u2717"
-            lines.append(f"  {mark} {c.case_name}  {c.passed_count}/{c.total}")
+            mark = "PASS" if c.passed else "FAIL"
+            lines.append(f"  [{mark}] {c.case_name}  {c.passed_count}/{c.total}")
         pct = round(self.score * 100)
         lines.append(f"Score: {self.passed_conditions}/{self.total_conditions} ({pct}%)")
         return "\n".join(lines)

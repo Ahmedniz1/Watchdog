@@ -1,4 +1,4 @@
-# LLM Watchdog — Project Specification
+# LLM Watchdog 
 
 **Version:** 1.0  
 **Status:** Pre-build  

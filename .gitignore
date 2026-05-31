@@ -15,3 +15,9 @@ Thumbs.db
 env/
 venv/
 .env
+
+# Packaging / build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
