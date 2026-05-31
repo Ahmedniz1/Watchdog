@@ -41,6 +41,18 @@ def make_fn(output: str, recorder: dict = None):
     return _fn
 
 
+def make_seq_fn(outputs):
+    """Fake completion_fn that returns ``outputs`` in order, cycling if needed."""
+    state = {"i": 0}
+
+    def _fn(prompt, *, model, temperature=0.0, max_tokens=None, **kwargs):
+        out = outputs[state["i"] % len(outputs)]
+        state["i"] += 1
+        return out
+
+    return _fn
+
+
 # --- run_case ----------------------------------------------------------------
 
 
@@ -118,6 +130,76 @@ def test_run_suite_resolves_model_per_case():
     assert res.suite_name == "s"
     assert res.passed is True
     assert res.total_conditions == 2
+
+
+# --- runs=N sampling ---------------------------------------------------------
+
+
+def test_runs_one_is_unchanged_single_result():
+    case = TestCase(name="c", prompt="{input}", model="m", conditions=[FakeContains("x")])
+    res = run_case(case, completion_fn=make_fn("x here"))
+    r = res.condition_results[0]
+    # Single-run path is left completely untouched: no sampling metadata.
+    assert r.runs == 1
+    assert r.pass_rate is None
+    assert r.passed is True
+
+
+def test_runs_aggregates_mean_score_and_pass_rate():
+    # Condition passes on 2 of 4 samples -> pass_rate 0.5, mean score 0.5.
+    fn = make_seq_fn(["has refund", "no match", "has refund", "no match"])
+    case = TestCase(name="c", prompt="{input}", model="m", conditions=[FakeContains("refund")])
+    res = run_case(case, completion_fn=fn, runs=4, temperature=0.7)
+
+    r = res.condition_results[0]
+    assert r.runs == 4
+    assert r.pass_rate == 0.5
+    assert r.score == 0.5
+    assert "2/4 runs" in r.detail
+    # Default min_pass_rate is 0.5 (majority), so 0.5 >= 0.5 passes.
+    assert r.passed is True
+
+
+def test_min_pass_rate_gate():
+    fn = make_seq_fn(["has refund", "no match", "has refund", "no match"])
+    case = TestCase(name="c", prompt="{input}", model="m", conditions=[FakeContains("refund")])
+    # Require 75% of runs to pass; only 50% do -> condition fails.
+    res = run_case(case, completion_fn=fn, runs=4, min_pass_rate=0.75, temperature=0.7)
+    assert res.condition_results[0].passed is False
+
+
+def test_runs_makes_n_calls():
+    seen = []
+
+    def fn(prompt, *, model, **kwargs):
+        seen.append(model)
+        return "x"
+
+    case = TestCase(name="c", prompt="{input}", model="m", conditions=[FakeContains("x")])
+    run_case(case, completion_fn=fn, runs=3, temperature=0.7)
+    assert len(seen) == 3
+
+
+def test_runs_less_than_one_rejected():
+    case = TestCase(name="c", prompt="{input}", model="m")
+    with pytest.raises(ValueError):
+        run_case(case, completion_fn=make_fn("x"), runs=0)
+
+
+def test_sampling_with_zero_temperature_warns():
+    case = TestCase(name="c", prompt="{input}", model="m", conditions=[FakeContains("x")])
+    with pytest.warns(UserWarning, match="identical samples"):
+        run_case(case, completion_fn=make_fn("x"), runs=3)  # temperature defaults to 0
+
+
+def test_runs_forwarded_through_suite():
+    fn = make_seq_fn(["x", "nope"])
+    case = TestCase(name="c", prompt="{input}", conditions=[FakeContains("x")])
+    suite = Suite(name="s", cases=[case], model="m")
+    res = suite.run(completion_fn=fn, runs=2, temperature=0.7)
+    cr = res.case_results[0].condition_results[0]
+    assert cr.runs == 2
+    assert cr.pass_rate == 0.5
 
 
 # --- default (litellm) path --------------------------------------------------

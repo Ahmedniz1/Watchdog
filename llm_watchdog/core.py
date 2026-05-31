@@ -88,13 +88,24 @@ class Condition(ABC):
 
 @dataclass
 class ConditionResult:
-    """Outcome of evaluating a single condition against a single output."""
+    """Outcome of evaluating a single condition against a single output.
+
+    ``runs`` and ``pass_rate`` describe sampling. For a normal single-run
+    evaluation they stay at their defaults (``runs=1``, ``pass_rate=None``) and
+    nothing changes. When the runner samples a case ``N`` times (``runs=N``),
+    these results are aggregated: ``score`` becomes the mean across runs and
+    ``pass_rate`` the fraction of runs in which the condition passed — the
+    stable signal that the data model's float-valued ``score`` was designed to
+    enable (see :meth:`Condition._result`).
+    """
 
     condition_type: str
     description: str
     passed: bool
     score: float = 0.0  # 0.0..1.0
     detail: str = ""
+    runs: int = 1  # number of samples aggregated into this result
+    pass_rate: Optional[float] = None  # fraction of runs passed; None when runs == 1
 
     def to_dict(self) -> Dict:
         return {
@@ -103,6 +114,8 @@ class ConditionResult:
             "passed": self.passed,
             "score": self.score,
             "detail": self.detail,
+            "runs": self.runs,
+            "pass_rate": self.pass_rate,
         }
 
 
