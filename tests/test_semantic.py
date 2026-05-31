@@ -10,8 +10,8 @@ import importlib.util
 
 import pytest
 
-from llm_watchdog import available_types
-from llm_watchdog.semantic import SemanticSimilarity
+from llm_tripwire import available_types
+from llm_tripwire.semantic import SemanticSimilarity
 
 HAS_ST = importlib.util.find_spec("sentence_transformers") is not None
 needs_st = pytest.mark.skipif(not HAS_ST, reason="sentence-transformers not installed")

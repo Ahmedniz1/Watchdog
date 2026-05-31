@@ -2,7 +2,7 @@
 
 Requires the `llm` extra and a provider API key:
 
-    pip install "llm-watchdog[llm]"
+    pip install "llm-tripwire[llm]"
     export OPENAI_API_KEY=sk-...        # or any provider LiteLLM supports
     python examples/with_model.py
 
@@ -10,8 +10,8 @@ It runs a small suite against the model, samples each case a few times so a
 single non-deterministic reply doesn't decide the result, and prints a summary.
 """
 
-from llm_watchdog import Suite, TestCase
-from llm_watchdog.conditions import contains, semantic_similarity, word_count
+from llm_tripwire import Suite, TestCase
+from llm_tripwire.conditions import contains, semantic_similarity, word_count
 
 MODEL = "gpt-4o-mini"  # any LiteLLM model string
 

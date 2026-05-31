@@ -7,8 +7,8 @@ fastest way to see how cases, conditions, and scoring fit together, and it's
 exactly what runs in the test suite (no model is called).
 """
 
-from llm_watchdog import TestCase
-from llm_watchdog.conditions import contains, not_contains, valid_json, word_count
+from llm_tripwire import TestCase
+from llm_tripwire.conditions import contains, not_contains, valid_json, word_count
 
 
 def main() -> None:

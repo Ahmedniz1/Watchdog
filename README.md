@@ -1,10 +1,10 @@
-# LLM Watchdog
+# LLM Tripwire
 
 **Catch prompt regressions before they ship — locally, in CI, without sending your data anywhere.**
 
 You change a prompt, swap a model, or nudge the temperature, eyeball a couple of
 outputs, and ship. A week later users complain the tone is off or the JSON broke.
-LLM Watchdog gives you a way to *define what "good" looks like* for an LLM
+LLM Tripwire gives you a way to *define what "good" looks like* for an LLM
 feature, run those checks against real model output, and fail your CI when fewer
 checks pass than before.
 
@@ -19,10 +19,10 @@ checks pass than before.
 ## Install
 
 ```bash
-pip install llm-watchdog                 # core: heuristic checks, scoring, pytest use
-pip install "llm-watchdog[semantic]"     # + local semantic_similarity (sentence-transformers)
-pip install "llm-watchdog[llm]"          # + run prompts / LLM-judge checks (litellm)
-pip install "llm-watchdog[all]"          # everything
+pip install llm-tripwire                 # core: heuristic checks, scoring, pytest use
+pip install "llm-tripwire[semantic]"     # + local semantic_similarity (sentence-transformers)
+pip install "llm-tripwire[llm]"          # + run prompts / LLM-judge checks (litellm)
+pip install "llm-tripwire[all]"          # everything
 ```
 
 The core install pulls in nothing extra. You only download the heavy bits if you
@@ -36,8 +36,8 @@ Define a case, say what its output must satisfy, and check it. This first exampl
 needs **no API key and no extra dependencies** — you score output you already have:
 
 ```python
-from llm_watchdog import TestCase
-from llm_watchdog.conditions import contains, not_contains, word_count
+from llm_tripwire import TestCase
+from llm_tripwire.conditions import contains, not_contains, word_count
 
 case = TestCase(
     name="refund query",
@@ -59,8 +59,8 @@ To actually call the model under test, install the `[llm]` extra, set the
 provider's API key, give the case a `model`, and use `.run()`:
 
 ```python
-from llm_watchdog import TestCase
-from llm_watchdog.conditions import contains, semantic_similarity
+from llm_tripwire import TestCase
+from llm_tripwire.conditions import contains, semantic_similarity
 
 case = TestCase(
     name="refund query",
@@ -112,7 +112,7 @@ Each condition yields a pass/fail **and** a 0–1 score. A case's score is
 ### Grouping cases into a suite
 
 ```python
-from llm_watchdog import Suite
+from llm_tripwire import Suite
 
 suite = Suite(name="support_bot", model="gpt-4o-mini", cases=[case, ...])
 report = suite.run()
@@ -151,7 +151,7 @@ your repo as the comparison point.
 
 ```python
 # Once, when the output is known-good:
-suite.run().save_baseline()          # writes .watchdog/<suite>.json  -> commit it
+suite.run().save_baseline()          # writes .tripwire/<suite>.json  -> commit it
 
 # Later, after a prompt/model change:
 diff = suite.run().diff_against_baseline()
@@ -188,7 +188,7 @@ be set explicitly** (use a different, cheaper model than the one under test to
 avoid self-serving bias):
 
 ```python
-from llm_watchdog.conditions import llm_judge, llm_factual, llm_rubric
+from llm_tripwire.conditions import llm_judge, llm_factual, llm_rubric
 
 llm_judge(
     criteria="The response is empathetic and makes no specific financial promises",
@@ -215,7 +215,7 @@ llm_rubric(
 Estimate the cost of a run before paying for it:
 
 ```python
-from llm_watchdog import estimate_run_cost
+from llm_tripwire import estimate_run_cost
 print(estimate_run_cost(suite))   # {'calls': 12, 'usd': 0.0036, 'by_model': {'gpt-4o-mini': 12}}
 ```
 
@@ -226,7 +226,7 @@ print(estimate_run_cost(suite))   # {'calls': 12, 'usd': 0.0036, 'by_model': {'g
 Every condition maps to a plain dict, so suites can come from config:
 
 ```python
-from llm_watchdog import TestCase, build_conditions
+from llm_tripwire import TestCase, build_conditions
 
 case = TestCase(
     name="refund query",
@@ -258,7 +258,7 @@ Shipped: core model · heuristic + semantic verifiers · LiteLLM runner ·
 `runs=N` sampling · LLM-judge layer · baseline storage + regression diff ·
 packaging.
 
-Next: a `watchdog` CLI (`run` / `--save-baseline` / `--diff --threshold`) ·
+Next: a `tripwire` CLI (`run` / `--save-baseline` / `--diff --threshold`) ·
 YAML loader · terminal & self-contained HTML reports · GitHub Actions template.
 
 Deliberately out of scope: a web UI/dashboard, prompt storage/versioning,
@@ -279,8 +279,8 @@ pytest
 
 Adding a verifier is a small, self-contained change: subclass `Condition`,
 decorate it with `@register("your_type")`, set `self.description` and implement
-`evaluate()`, then expose it in `llm_watchdog/conditions.py`. See the existing
-verifiers in `llm_watchdog/verifiers.py` for the pattern.
+`evaluate()`, then expose it in `llm_tripwire/conditions.py`. See the existing
+verifiers in `llm_tripwire/verifiers.py` for the pattern.
 
 ## License
 

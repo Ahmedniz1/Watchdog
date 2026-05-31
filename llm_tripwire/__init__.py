@@ -1,6 +1,6 @@
-"""LLM Watchdog — local-first regression testing for LLM outputs."""
+"""LLM Tripwire — local-first regression testing for LLM outputs."""
 
-from llm_watchdog.core import (
+from llm_tripwire.core import (
     Condition,
     ConditionResult,
     CaseResult,
@@ -8,25 +8,25 @@ from llm_watchdog.core import (
     TestCase,
     Suite,
 )
-from llm_watchdog.verifiers import (
+from llm_tripwire.verifiers import (
     build_condition,
     build_conditions,
     available_types,
     ConditionConfigError,
 )
-from llm_watchdog.runner import (
+from llm_tripwire.runner import (
     run_case,
     run_suite,
     RunnerError,
 )
-from llm_watchdog.llm_judge import (
+from llm_tripwire.llm_judge import (
     LLMJudge,
     LLMFactual,
     LLMRubric,
     estimate_run_cost,
     is_judge_condition,
 )
-from llm_watchdog.baseline import (
+from llm_tripwire.baseline import (
     save_baseline,
     load_baseline,
     compare,
@@ -38,7 +38,7 @@ from llm_watchdog.baseline import (
 
 # Importing this module registers the optional semantic verifier's *type*
 # without importing torch (the heavy import is deferred to evaluation time).
-from llm_watchdog import semantic  # noqa: F401
+from llm_tripwire import semantic  # noqa: F401
 
 # Likewise, importing the runner and llm_judge modules above registers the
 # LLM-judge verifier *types* without importing litellm — that network

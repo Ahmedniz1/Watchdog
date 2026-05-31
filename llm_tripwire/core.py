@@ -1,4 +1,4 @@
-"""Core data model for LLM Watchdog.
+"""Core data model for LLM Tripwire.
 
 Defines the building blocks used across the whole package:
 
@@ -232,26 +232,26 @@ class SuiteResult:
             "cases": [c.to_dict() for c in self.case_results],
         }
 
-    def save_baseline(self, directory: str = ".watchdog"):
+    def save_baseline(self, directory: str = ".tripwire"):
         """Persist this result as the regression baseline for its suite.
 
-        Convenience wrapper over :func:`llm_watchdog.baseline.save_baseline`.
+        Convenience wrapper over :func:`llm_tripwire.baseline.save_baseline`.
         Imported lazily to keep ``core`` free of even intra-package import
         ordering constraints. Returns the path written.
         """
-        from llm_watchdog.baseline import save_baseline
+        from llm_tripwire.baseline import save_baseline
 
         return save_baseline(self, directory=directory)
 
-    def diff_against_baseline(self, directory: str = ".watchdog"):
+    def diff_against_baseline(self, directory: str = ".tripwire"):
         """Compare this result to the saved baseline; ``None`` if none exists.
 
-        Convenience wrapper over :func:`llm_watchdog.baseline.load_baseline` +
-        :func:`llm_watchdog.baseline.compare`. Returns a
-        :class:`~llm_watchdog.baseline.SuiteDiff`, or ``None`` when no baseline
+        Convenience wrapper over :func:`llm_tripwire.baseline.load_baseline` +
+        :func:`llm_tripwire.baseline.compare`. Returns a
+        :class:`~llm_tripwire.baseline.SuiteDiff`, or ``None`` when no baseline
         has been saved yet (the caller decides whether that's an error).
         """
-        from llm_watchdog.baseline import compare, load_baseline
+        from llm_tripwire.baseline import compare, load_baseline
 
         base = load_baseline(self.suite_name, directory=directory)
         if base is None:
@@ -312,12 +312,12 @@ class TestCase:
     def run(self, model: Optional[str] = None, **kwargs) -> CaseResult:
         """Call the model under test and score the output. Makes one LLM call.
 
-        Convenience wrapper around :func:`llm_watchdog.runner.run_case` so the
+        Convenience wrapper around :func:`llm_tripwire.runner.run_case` so the
         quickstart ``case.run()`` works. ``runner`` is imported lazily here:
         it pulls in the optional ``litellm`` dependency, and keeping that off
         the core import path is what lets the offline layer stay dependency-free.
         """
-        from llm_watchdog.runner import run_case  # lazy: keeps litellm optional
+        from llm_tripwire.runner import run_case  # lazy: keeps litellm optional
 
         return run_case(self, model=model, **kwargs)
 
@@ -362,11 +362,11 @@ class Suite:
     def run(self, model: Optional[str] = None, **kwargs) -> SuiteResult:
         """Run every case against its model and score the outputs. One call per case.
 
-        Convenience wrapper around :func:`llm_watchdog.runner.run_suite` so the
+        Convenience wrapper around :func:`llm_tripwire.runner.run_suite` so the
         quickstart ``suite.run()`` works. Imported lazily for the same reason as
         :meth:`TestCase.run` — to keep the optional ``litellm`` dependency off
         the core import path.
         """
-        from llm_watchdog.runner import run_suite  # lazy: keeps litellm optional
+        from llm_tripwire.runner import run_suite  # lazy: keeps litellm optional
 
         return run_suite(self, model=model, **kwargs)

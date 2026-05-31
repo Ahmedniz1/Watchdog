@@ -9,7 +9,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - **Baseline storage + regression diff** — `save_baseline()` writes a suite's
-  condition pass rates to `.watchdog/<suite>.json` (no raw output persisted), and
+  condition pass rates to `.tripwire/<suite>.json` (no raw output persisted), and
   `diff_against_baseline()` compares a later run against it. `SuiteDiff.summary()`
   prints a terminal-safe table and `within_threshold(pct)` gates CI on the
   allowed score drop. New cases never count as regressions; removed cases are
@@ -17,7 +17,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.1.0] - 2026-05-31
 
-First packaged release: `pip install llm-watchdog` now works, with a
+First packaged release: `pip install llm-tripwire` now works, with a
 dependency-free core and optional `[semantic]` / `[llm]` extras.
 
 ### Added
@@ -36,7 +36,7 @@ dependency-free core and optional `[semantic]` / `[llm]` extras.
   pass/fail.
 - **V2 LLM judges** — `llm_judge`, `llm_factual`, `llm_rubric`, with a required
   (no-default) `judge_model` and an `estimate_run_cost` helper.
-- **Friendly API** — `llm_watchdog.conditions` exposes every verifier as a
+- **Friendly API** — `llm_tripwire.conditions` exposes every verifier as a
   lowercase, function-style constructor.
 
 [Unreleased]: https://github.com/Ahmedniz1/Watchdog/compare/v0.1.0...HEAD

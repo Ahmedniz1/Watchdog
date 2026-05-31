@@ -1,7 +1,7 @@
-"""The runner — the one place LLM Watchdog actually calls a model.
+"""The runner — the one place LLM Tripwire actually calls a model.
 
 Everything else in the package is offline and deterministic. This module is the
-seam where a :class:`~llm_watchdog.core.TestCase` stops being pure data and
+seam where a :class:`~llm_tripwire.core.TestCase` stops being pure data and
 becomes a real network call: render the prompt, send it to the model under test
 via LiteLLM, hand the raw text back to the offline scoring layer
 (``TestCase.evaluate_output``). That clean split is deliberate — the scoring is
@@ -14,7 +14,7 @@ call across every provider, keyed by a model string like ``"gpt-4o-mini"`` or
 how ``semantic.py`` defers ``sentence-transformers``) so that importing the core
 library stays fast and dependency-free::
 
-    pip install llm-watchdog[llm]
+    pip install llm-tripwire[llm]
 
 Testability: the actual network call goes through a single ``completion_fn``
 parameter. Production code leaves it ``None`` and the LiteLLM wrapper is used;
@@ -27,7 +27,7 @@ from __future__ import annotations
 import warnings
 from typing import Callable, List, Optional
 
-from llm_watchdog.core import CaseResult, ConditionResult, Suite, SuiteResult, TestCase
+from llm_tripwire.core import CaseResult, ConditionResult, Suite, SuiteResult, TestCase
 
 #: Signature of the pluggable completion function. It receives the rendered
 #: prompt plus the resolved model string and returns the model's text output.
@@ -62,7 +62,7 @@ def _litellm_complete(
     """Default completion function: a thin lazy wrapper over ``litellm.completion``.
 
     Imported lazily so the heavy/optional ``litellm`` dependency is only required
-    when an actual run happens, not on ``import llm_watchdog``. Raises a clear,
+    when an actual run happens, not on ``import llm_tripwire``. Raises a clear,
     actionable :class:`ImportError` if the extra isn't installed.
     """
     try:
@@ -70,7 +70,7 @@ def _litellm_complete(
     except ImportError as e:  # pragma: no cover - exercised only without the extra
         raise ImportError(
             "Running cases against a model requires the 'llm' extra. "
-            "Install it with:  pip install llm-watchdog[llm]"
+            "Install it with:  pip install llm-tripwire[llm]"
         ) from e
 
     messages = [{"role": "user", "content": prompt}]

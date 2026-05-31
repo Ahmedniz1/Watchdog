@@ -3,7 +3,7 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "llm-watchdog"
+name = "llm-tripwire"
 description = "Local-first, CI-friendly regression testing for LLM outputs."
 readme = "README.md"
 requires-python = ">=3.8"
@@ -29,7 +29,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 # The core install is intentionally dependency-free: the heuristic verifiers and
-# the whole scoring/result layer are pure stdlib, so `pip install llm-watchdog`
+# the whole scoring/result layer are pure stdlib, so `pip install llm-tripwire`
 # stays tiny and fast. The two heavy capabilities are opt-in extras below.
 dependencies = []
 dynamic = ["version"]
@@ -50,16 +50,16 @@ Repository = "https://github.com/Ahmedniz1/Watchdog"
 Issues = "https://github.com/Ahmedniz1/Watchdog/issues"
 
 [tool.setuptools]
-# Single source of truth for the version: llm_watchdog/__init__.py. Safe to read
+# Single source of truth for the version: llm_tripwire/__init__.py. Safe to read
 # at build time because importing the package never imports torch or litellm
 # (those are deferred until a verifier actually runs).
-packages = ["llm_watchdog"]
+packages = ["llm_tripwire"]
 
 [tool.setuptools.dynamic]
-version = { attr = "llm_watchdog.__version__" }
+version = { attr = "llm_tripwire.__version__" }
 
 [tool.setuptools.package-data]
-llm_watchdog = ["py.typed"]
+llm_tripwire = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

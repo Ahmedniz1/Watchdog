@@ -10,8 +10,8 @@ import importlib.util
 
 import pytest
 
-from llm_watchdog import RunnerError, TestCase, Suite, run_case, run_suite
-from llm_watchdog.core import Condition
+from llm_tripwire import RunnerError, TestCase, Suite, run_case, run_suite
+from llm_tripwire.core import Condition
 
 HAS_LITELLM = importlib.util.find_spec("litellm") is not None
 
@@ -208,7 +208,7 @@ def test_runs_forwarded_through_suite():
 @pytest.mark.skipif(HAS_LITELLM, reason="litellm installed; the missing-dep path can't be exercised")
 def test_default_completion_requires_litellm():
     """With no completion_fn and litellm absent, a helpful ImportError surfaces."""
-    from llm_watchdog.runner import _litellm_complete
+    from llm_tripwire.runner import _litellm_complete
 
     with pytest.raises(ImportError) as ei:
         _litellm_complete("hi", model="gpt-4o-mini")

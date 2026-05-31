@@ -9,7 +9,7 @@ import json
 
 import pytest
 
-from llm_watchdog import (
+from llm_tripwire import (
     Suite,
     TestCase,
     BaselineError,
@@ -17,8 +17,8 @@ from llm_watchdog import (
     load_baseline,
     save_baseline,
 )
-from llm_watchdog.baseline import baseline_path
-from llm_watchdog.core import Condition
+from llm_tripwire.baseline import baseline_path
+from llm_tripwire.core import Condition
 
 
 class FakeContains(Condition):

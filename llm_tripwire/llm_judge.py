@@ -33,9 +33,9 @@ from __future__ import annotations
 import json
 from typing import List, Optional
 
-from llm_watchdog.core import Condition, ConditionResult
-from llm_watchdog.runner import CompletionFn, _litellm_complete
-from llm_watchdog.verifiers import _parse_json, register
+from llm_tripwire.core import Condition, ConditionResult
+from llm_tripwire.runner import CompletionFn, _litellm_complete
+from llm_tripwire.verifiers import _parse_json, register
 
 #: Judges should be reproducible across runs, same reasoning as the runner.
 DEFAULT_JUDGE_TEMPERATURE = 0.0
@@ -332,7 +332,7 @@ def is_judge_condition(condition: Condition) -> bool:
 
 
 def estimate_run_cost(suite) -> dict:
-    """Estimate the cost of the judge calls a :class:`~llm_watchdog.core.Suite` run will make.
+    """Estimate the cost of the judge calls a :class:`~llm_tripwire.core.Suite` run will make.
 
     Returns ``{"calls": int, "usd": float, "by_model": {model: calls}}``. Each
     judge condition is one model call (``llm_rubric`` batches all its points into

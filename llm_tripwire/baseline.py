@@ -5,7 +5,7 @@ needs a *yesterday* to compare against. That comparison is this module's job.
 
 The model follows spec Decision 1: a baseline is a set of **condition pass
 rates**, never captured LLM text. We persist a :class:`SuiteResult` (whose
-``to_dict`` already omits raw output) under ``.watchdog/<suite>.json``, commit
+``to_dict`` already omits raw output) under ``.tripwire/<suite>.json``, commit
 it to the repo, and on later runs compare the current result against it. A
 "regression" is *fewer conditions passing than before* — not "the text changed",
 which for non-deterministic models would be meaningless noise.
@@ -34,11 +34,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Mapping, Optional
 
-from llm_watchdog.core import SuiteResult
+from llm_tripwire.core import SuiteResult
 
 #: Where baselines live by default. Committed to the repo so the comparison
 #: point travels with the code that produced it.
-DEFAULT_DIR = ".watchdog"
+DEFAULT_DIR = ".tripwire"
 
 #: Bumped if the on-disk JSON layout ever changes, so old files fail loudly
 #: instead of being silently misread.

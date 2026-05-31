@@ -9,7 +9,7 @@ import json
 
 import pytest
 
-from llm_watchdog import (
+from llm_tripwire import (
     LLMJudge,
     LLMFactual,
     LLMRubric,

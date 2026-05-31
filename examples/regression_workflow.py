@@ -5,13 +5,13 @@ Run it with:  python examples/regression_workflow.py
 Offline (no model, no key): it scores canned outputs so you can see the whole
 save-baseline / diff loop. In a real project you'd call `suite.run()` instead of
 `evaluate_outputs(...)`, save the baseline once when the output is good, commit
-`.watchdog/` to your repo, and then diff on every prompt change.
+`.tripwire/` to your repo, and then diff on every prompt change.
 """
 
 import tempfile
 
-from llm_watchdog import Suite, TestCase
-from llm_watchdog.conditions import contains
+from llm_tripwire import Suite, TestCase
+from llm_tripwire.conditions import contains
 
 
 def build_suite() -> Suite:
@@ -28,7 +28,7 @@ def build_suite() -> Suite:
 
 def main() -> None:
     suite = build_suite()
-    store = tempfile.mkdtemp()  # a real project commits ".watchdog/" instead
+    store = tempfile.mkdtemp()  # a real project commits ".tripwire/" instead
 
     # 1) Bless a known-good run as the baseline.
     good = {

@@ -1,4 +1,4 @@
-# LLM Watchdog 
+# LLM Tripwire 
 
 **Version:** 1.0  
 **Status:** Pre-build  
@@ -19,7 +19,7 @@ There is no lightweight, local, CI-friendly way to catch prompt regressions befo
 - Are built for traditional ML, not LLM output evaluation (Evidently, WhyLabs)
 - Force custom DSLs that don't fit into existing test workflows
 
-**LLM Watchdog is a Python-native, local-first regression testing library for LLM outputs.** It gives developers a structured way to define what "correct" looks like, run verifiers against real outputs, and catch regressions before they ship — without sending data to a third party, without paying per evaluation, and without learning a new framework.
+**LLM Tripwire is a Python-native, local-first regression testing library for LLM outputs.** It gives developers a structured way to define what "correct" looks like, run verifiers against real outputs, and catch regressions before they ship — without sending data to a third party, without paying per evaluation, and without learning a new framework.
 
 ---
 
@@ -72,8 +72,8 @@ A pip-installable Python package that lets a developer:
 The primary interface. Works natively inside a standard Pytest file.
 
 ```python
-from llm_watchdog import TestCase, Suite
-from llm_watchdog.conditions import contains, not_contains, word_count, semantic_similarity, regex_match, valid_json
+from llm_tripwire import TestCase, Suite
+from llm_tripwire.conditions import contains, not_contains, word_count, semantic_similarity, regex_match, valid_json
 
 # Define a test case
 case = TestCase(
@@ -99,7 +99,7 @@ print(result.summary())
 # Or group into a suite and run all
 suite = Suite(name="support_bot", cases=[case, ...])
 report = suite.run()
-report.save("./watchdog_report.html")
+report.save("./tripwire_report.html")
 assert report.passed, f"Regression detected: {report.delta_summary()}"
 ```
 
@@ -117,7 +117,7 @@ def test_support_refund_query():
 For teams that prefer config-driven test suites. The YAML is a thin layer that maps directly to the Python API — no functionality exists in YAML that doesn't exist in Python.
 
 ```yaml
-# watchdog/support_suite.yaml
+# tripwire/support_suite.yaml
 suite: support_bot
 model: gpt-4o-mini
 cases:
@@ -150,9 +150,9 @@ cases:
 Run from CLI:
 
 ```bash
-watchdog run --suite watchdog/support_suite.yaml
-watchdog run --suite watchdog/support_suite.yaml --save-baseline
-watchdog run --suite watchdog/support_suite.yaml --diff
+tripwire run --suite tripwire/support_suite.yaml
+tripwire run --suite tripwire/support_suite.yaml --save-baseline
+tripwire run --suite tripwire/support_suite.yaml --diff
 ```
 
 ### 4.4 Verifier Types (V1)
@@ -180,7 +180,7 @@ The `semantic_similarity` verifier uses `sentence-transformers` with a small loc
 
 **Per suite:** Suite score = total conditions passed / total conditions across all cases.
 
-**Baseline:** When you run `--save-baseline`, results are stored in a local `.watchdog/` directory as JSON with a timestamp and suite name. This is committed to the repo.
+**Baseline:** When you run `--save-baseline`, results are stored in a local `.tripwire/` directory as JSON with a timestamp and suite name. This is committed to the repo.
 
 **Regression delta:** On subsequent runs, current suite score is compared against the stored baseline. The diff output shows:
 
@@ -201,7 +201,7 @@ Delta:   -19%
 A configurable `--threshold` flag (default: 0%) controls how much regression is tolerable before the CLI exits with a non-zero code (failing CI).
 
 ```bash
-watchdog run --suite suite.yaml --diff --threshold 10
+tripwire run --suite suite.yaml --diff --threshold 10
 # passes if score dropped less than 10% from baseline
 ```
 
@@ -229,18 +229,18 @@ on:
   pull_request:
     paths:
       - 'prompts/**'
-      - 'watchdog/**'
+      - 'tripwire/**'
 
 jobs:
-  watchdog:
+  tripwire:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - run: pip install llm-watchdog
-      - run: watchdog run --suite watchdog/suite.yaml --diff --threshold 5
+      - run: pip install llm-tripwire
+      - run: tripwire run --suite tripwire/suite.yaml --diff --threshold 5
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
@@ -256,11 +256,11 @@ Build in this sequence. Each step is independently testable before moving to the
 3. **Semantic similarity verifier** — integrate `sentence-transformers`, test locally
 4. **LiteLLM integration** — the runner that takes a `TestCase`, calls the model, returns raw output
 5. **Scoring logic** — pass/fail per condition, aggregate per case and suite
-6. **Baseline storage** — read/write `.watchdog/` JSON files, diff calculator
+6. **Baseline storage** — read/write `.tripwire/` JSON files, diff calculator
 7. **Terminal reporter** — formatted CLI output with color (use `rich`)
 8. **HTML report generator** — self-contained HTML, no external dependencies
 9. **YAML parser** — maps YAML schema to Python `TestCase` objects
-10. **CLI** — `watchdog run`, `watchdog diff`, `watchdog baseline` commands (use `typer`)
+10. **CLI** — `tripwire run`, `tripwire diff`, `tripwire baseline` commands (use `typer`)
 11. **GitHub Actions template + README**
 12. **PyPI packaging** — `pyproject.toml`, publish to PyPI
 
@@ -289,7 +289,7 @@ V2 adds LLM-based verifiers as an explicit opt-in layer. Nothing in V1 changes. 
 **`llm_judge`** — The most general. Provide a plain-English criterion, the judge model evaluates whether the output meets it. Returns pass/fail with a brief explanation.
 
 ```python
-from llm_watchdog.conditions import llm_judge
+from llm_tripwire.conditions import llm_judge
 
 llm_judge(
     criteria="The response is empathetic and does not make any specific financial promises",
@@ -301,7 +301,7 @@ llm_judge(
 **`llm_factual`** — Checks factual consistency of the output against a provided reference document. Useful for RAG pipelines where hallucination is the main risk.
 
 ```python
-from llm_watchdog.conditions import llm_factual
+from llm_tripwire.conditions import llm_factual
 
 llm_factual(
     reference_doc="Our refund policy states: returns accepted within 30 days...",
@@ -312,7 +312,7 @@ llm_factual(
 **`llm_rubric`** — Multi-point rubric scoring. Define several criteria, get a score per criterion and an aggregate.
 
 ```python
-from llm_watchdog.conditions import llm_rubric
+from llm_tripwire.conditions import llm_rubric
 
 llm_rubric(
     rubric=[
@@ -358,8 +358,8 @@ This is skipped with a `--yes` flag for CI use.
 ## 6. Project Structure
 
 ```
-llm-watchdog/
-├── llm_watchdog/
+llm-tripwire/
+├── llm_tripwire/
 │   ├── __init__.py
 │   ├── core.py              # TestCase, Suite, result dataclasses
 │   ├── runner.py            # LiteLLM integration, executes prompts
@@ -369,7 +369,7 @@ llm-watchdog/
 │   │   ├── semantic.py      # semantic_similarity via sentence-transformers
 │   │   └── llm_judge.py     # V2: llm_judge, llm_factual, llm_rubric
 │   ├── scoring.py           # pass/fail aggregation, delta calculation
-│   ├── baseline.py          # read/write .watchdog/ JSON baseline files
+│   ├── baseline.py          # read/write .tripwire/ JSON baseline files
 │   ├── reporter/
 │   │   ├── terminal.py      # rich-based CLI output
 │   │   ├── html.py          # HTML report generator
@@ -402,7 +402,7 @@ The README is as important as the code for an open-source portfolio project. Str
 
 1. **One-line description** — what it does, who it's for
 2. **The problem** — 3 sentences, no jargon
-3. **Install** — `pip install llm-watchdog`
+3. **Install** — `pip install llm-tripwire`
 4. **Quickstart** — working code example, copy-pasteable, under 20 lines
 5. **How conditions work** — table of all verifier types
 6. **Regression detection** — show the terminal output screenshot
@@ -451,7 +451,7 @@ Each of these would either duplicate existing tools or expand scope beyond what 
 ## 10. Success Criteria
 
 V1 is done when:
-- `pip install llm-watchdog` works
+- `pip install llm-tripwire` works
 - The quickstart example in the README runs end-to-end in under 5 minutes
 - All verifier types have unit tests that pass without any LLM API call
 - A GitHub Actions run catches a real regression on a prompt change

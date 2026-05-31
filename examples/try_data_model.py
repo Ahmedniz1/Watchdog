@@ -1,5 +1,5 @@
 """
-Try the LLM Watchdog verifier library (Features 1 + 2) by hand.
+Try the LLM Tripwire verifier library (Features 1 + 2) by hand.
 
 This uses the REAL built-in verifiers now (the earlier throwaway stand-ins are
 gone). It walks through:
@@ -22,7 +22,7 @@ import sys
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, REPO_ROOT)
 
-from llm_watchdog import TestCase, Suite, build_conditions, available_types  # noqa: E402
+from llm_tripwire import TestCase, Suite, build_conditions, available_types  # noqa: E402
 
 
 def show_case(res):

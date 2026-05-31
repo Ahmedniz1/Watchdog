@@ -5,7 +5,7 @@ This is the one verifier that is *not* dependency-free: it needs
 core install lightweight and deterministic, that dependency is an optional
 extra::
 
-    pip install llm-watchdog[semantic]
+    pip install llm-tripwire[semantic]
 
 and it is imported lazily — only when a ``semantic_similarity`` condition is
 actually evaluated. Importing this module does NOT import torch.
@@ -21,8 +21,8 @@ from __future__ import annotations
 
 from typing import Optional
 
-from llm_watchdog.core import Condition, ConditionResult
-from llm_watchdog.verifiers import register
+from llm_tripwire.core import Condition, ConditionResult
+from llm_tripwire.verifiers import register
 
 # Default model: small, fast, widely used. ~80MB, downloaded once and cached.
 DEFAULT_MODEL = "all-MiniLM-L6-v2"
@@ -44,7 +44,7 @@ def _get_model(model_name: str):
     except ImportError as e:  # pragma: no cover - exercised only without the extra
         raise ImportError(
             "semantic_similarity requires the 'semantic' extra. "
-            "Install it with:  pip install llm-watchdog[semantic]"
+            "Install it with:  pip install llm-tripwire[semantic]"
         ) from e
     model = SentenceTransformer(model_name)
     _MODEL_CACHE[model_name] = model

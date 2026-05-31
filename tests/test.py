@@ -5,8 +5,8 @@ to exercise the schema, scoring, and templating in isolation. Everything runs
 without any LLM API call.
 """
 
-from llm_watchdog import TestCase, Suite, CaseResult, SuiteResult
-from llm_watchdog.core import Condition
+from llm_tripwire import TestCase, Suite, CaseResult, SuiteResult
+from llm_tripwire.core import Condition
 
 
 class FakeContains(Condition):

@@ -1,12 +1,12 @@
-"""Tests for the friendly `llm_watchdog.conditions` constructor API.
+"""Tests for the friendly `llm_tripwire.conditions` constructor API.
 
-These guard the promise the README makes: ``from llm_watchdog.conditions import
+These guard the promise the README makes: ``from llm_tripwire.conditions import
 contains`` works, the lowercase names build the right verifier objects, and the
 quickstart example actually runs. All offline.
 """
 
-from llm_watchdog import TestCase
-from llm_watchdog.conditions import (
+from llm_tripwire import TestCase
+from llm_tripwire.conditions import (
     bullet_count,
     contains,
     ends_with,
@@ -21,9 +21,9 @@ from llm_watchdog.conditions import (
     valid_json,
     word_count,
 )
-from llm_watchdog.core import Condition
-from llm_watchdog.llm_judge import LLMJudge
-from llm_watchdog.verifiers import Contains, WordCount
+from llm_tripwire.core import Condition
+from llm_tripwire.llm_judge import LLMJudge
+from llm_tripwire.verifiers import Contains, WordCount
 
 
 def test_constructors_build_condition_instances():

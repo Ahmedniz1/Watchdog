@@ -1,12 +1,12 @@
 """Deterministic verifiers — the built-in condition library.
 
 Every verifier here is pure and offline: it takes a string and returns a
-:class:`~llm_watchdog.core.ConditionResult`. No network, no API key, no
+:class:`~llm_tripwire.core.ConditionResult`. No network, no API key, no
 randomness. That is what lets the whole test suite run in CI for free and
 makes results reproducible (spec sections 4.9 and 10).
 
 The continuous/embedding-based ``semantic_similarity`` verifier lives in
-``llm_watchdog.semantic`` instead, because it pulls in heavy optional
+``llm_tripwire.semantic`` instead, because it pulls in heavy optional
 dependencies (sentence-transformers / torch). Keeping it out of this module
 means importing the core library stays fast and dependency-free.
 
@@ -24,7 +24,7 @@ import json
 import re
 from typing import Callable, Dict, List, Optional, Type
 
-from llm_watchdog.core import Condition, ConditionResult
+from llm_tripwire.core import Condition, ConditionResult
 
 
 # ---------------------------------------------------------------------------
